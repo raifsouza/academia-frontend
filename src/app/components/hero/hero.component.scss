@@ -1,0 +1,265 @@
+@import '../../../styles.scss';
+
+.hero {
+  padding: 4rem 5%;
+  text-align: left;
+  user-select: none; 
+  h1 {
+    font-size: 2.5rem;
+    color: $text-light;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: #888;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 3rem;
+  }
+
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+
+    .media-item {
+      height: 700px;
+      background: #000;
+      border: 1px solid #222;
+      border-radius: 8px;
+      overflow: hidden;
+
+      img,
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+.about-section {
+  width: 100%;
+  margin-top: 4rem;
+  padding-top: 4rem;
+  border-top: 1px solid #222;
+  text-align: center;
+  background-color: $secondary-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .description {
+    padding: 4rem 5%;
+    background-color: $secondary-color;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 5rem;
+
+    h2 {
+      color: $primary-color;
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #ccc;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+  }
+
+  .schedule-wrapper {
+    display: flex;
+    align-items: center; // Centraliza verticalmente texto e imagem
+    justify-content: space-between;
+    gap: 40px;
+    text-align: left; // Texto alinhado à esquerda
+
+    .schedule-text {
+      flex: 1;
+
+      h3 {
+        color: $primary-color;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: #aaa;
+        margin-bottom: 1.5rem;
+      }
+
+      .schedule-list {
+        list-style: none;
+
+        li {
+          margin-bottom: 10px;
+          font-size: 1.1rem;
+          color: $text-light;
+
+          strong {
+            color: $primary-color;
+          }
+        }
+      }
+    }
+
+    .schedule-image-box {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+
+      .schedule-img {
+        width: 100%;
+        max-width: 450px; // <-- TAMANHO MÁXIMO DEFINIDO AQUI
+        height: auto;
+        border: 2px solid $primary-color;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+}
+
+// Ajuste da Seção de Preços (Lado a Lado)
+.pricing-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  margin-bottom: 6rem;
+  width: 100%;
+  text-align: left;
+
+  .pricing-image {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end; // Alinha a imagem para "encostar" no centro
+
+    .side-img {
+      width: 100%;
+      max-width: 500px; // Tamanho máximo da imagem de preços
+      border: 2px solid $primary-color;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .pricing-text {
+    flex: 1;
+
+    h3 {
+      color: $primary-color;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    p {
+      color: #ccc;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .features-list {
+      list-style: none;
+      margin-bottom: 2rem;
+
+      li {
+        color: $text-light;
+        margin-bottom: 10px;
+
+        i {
+          color: $primary-color;
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+}
+
+// Mantendo o Sobre Centralizado no fim
+.description {
+  text-align: center;
+  max-width: 800px;
+
+  h2 {
+    color: $primary-color;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #ccc;
+    line-height: 1.8;
+  }
+}
+
+
+.btn-signup {
+  background: $primary-color;
+  color: $secondary-color;
+  border: 2px solid $primary-color;
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  border-radius: 50px; // Formato pílula mais moderno
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+  margin-top: 1rem;
+
+  // Efeito de brilho ao passar o mouse
+  &:hover {
+    background: transparent;
+    color: $primary-color;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba($primary-color, 0.5);
+
+    &::before {
+      transform: translateX(100%);
+    }
+  }
+
+  // Animação de brilho (flash) que atravessa o botão
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent);
+    transition: all 0.6s;
+  }
+
+  &:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 10px rgba($primary-color, 0.3);
+  }
+}
+
+// AJUSTE PARA CELULAR (IMPORTANTE)
+@media (max-width: 850px) {
+  .about-section .schedule-wrapper {
+    flex-direction: column; // Empilha o texto em cima da imagem no celular
+    text-align: center;
+
+    .schedule-text {
+      margin-bottom: 2rem;
+    }
+
+    .schedule-image-box .schedule-img {
+      max-width: 100%; // No celular ela ocupa a largura disponível
+    }
+  }
+}

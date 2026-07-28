@@ -1,0 +1,129 @@
+<div class="cadastro-container">
+  <div class="cadastro-card">
+    <div class="cadastro-header">
+      <h2>CADASTRO DE ALUNO</h2>
+      <p>Preencha os dados abaixo para vincular um novo membro à Power Shape</p>
+    </div>
+
+    <form [formGroup]="cadastroForm" (ngSubmit)="onSubmit()" class="cadastro-form">
+      
+      <!-- Upload e Preview de Foto -->
+      <div class="photo-upload-section">
+        <div class="photo-preview">
+          <img [src]="photoPreview || 'https://via.placeholder.com/120x120?text=FOTO'" alt="Preview Aluno">
+        </div>
+        <div class="photo-input-wrapper">
+          <label for="foto" class="btn-upload"><i class="fas fa-camera"></i> Selecionar Foto</label>
+          <input type="file" id="foto" (change)="onFileChange($event)" accept="image/*">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        
+        <!-- Nome Completo -->
+        <div class="form-group full-width">
+          <label for="nome">NOME DO ALUNO *</label>
+          <input type="text" id="nome" formControlName="nome" placeholder="Digite o nome completo">
+          <span class="error-msg" *ngIf="cadastroForm.get('nome')?.touched && cadastroForm.get('nome')?.invalid">
+            Nome é obrigatório (mínimo 3 caracteres)
+          </span>
+        </div>
+
+        <!-- E-mail -->
+        <div class="form-group">
+          <label for="email">E-MAIL *</label>
+          <input type="email" id="email" formControlName="email" placeholder="aluno@email.com">
+          <span class="error-msg" *ngIf="cadastroForm.get('email')?.touched && cadastroForm.get('email')?.invalid">
+            Insira um e-mail válido
+          </span>
+        </div>
+
+        <!-- Telefone -->
+        <div class="form-group">
+          <label for="telefone">TELEFONE / WHATSAPP *</label>
+          <input type="tel" id="telefone" formControlName="telefone" placeholder="(00) 00000-0000">
+        </div>
+
+        <!-- Senha -->
+        <div class="form-group">
+          <label for="senha">SENHA *</label>
+          <input type="password" id="senha" formControlName="senha" placeholder="Mínimo 6 caracteres">
+        </div>
+
+        <!-- Confirmar Senha -->
+        <div class="form-group">
+          <label for="confirmarSenha">CONFIRMAR SENHA *</label>
+          <input type="password" id="confirmarSenha" formControlName="confirmarSenha" placeholder="Repita a senha">
+          <span class="error-msg" *ngIf="cadastroForm.get('confirmarSenha')?.touched && cadastroForm.get('confirmarSenha')?.hasError('senhasDiferentes')">
+            As senhas não coincidem
+          </span>
+        </div>
+
+        <!-- Data de Nascimento -->
+        <div class="form-group">
+          <label for="dataNascimento">DATA DE NASCIMENTO *</label>
+          <input type="date" id="dataNascimento" formControlName="dataNascimento">
+        </div>
+
+        <!-- Aula Experimental -->
+        <div class="form-group">
+          <label for="agendarAulaExperimental">AULA EXPERIMENTAL (DATA E HORA)</label>
+          <input type="datetime-local" id="agendarAulaExperimental" formControlName="agendarAulaExperimental">
+          <span class="error-msg" *ngIf="cadastroForm.get('agendarAulaExperimental')?.hasError('dataPassada')">
+            A data da aula não pode ser anterior ao dia/horário de hoje!
+          </span>
+        </div>
+
+        <!-- Data de Cadastro -->
+        <div class="form-group">
+          <label for="dataCadastro">DATA DE CADASTRO</label>
+          <input type="date" id="dataCadastro" formControlName="dataCadastro">
+          <small class="info-text">Preenchido automaticamente</small>
+        </div>
+
+        <!-- Dia de Vencimento -->
+        <div class="form-group">
+          <label for="diaVencimento">DIA DE VENCIMENTO *</label>
+          <select id="diaVencimento" formControlName="diaVencimento" class="select-vencimento">
+            <option *ngFor="let dia of diasVencimento" [value]="dia">
+              Dia {{ dia }}
+            </option>
+          </select>
+          <small class="info-text">Dia mensal da mensalidade</small>
+        </div>
+
+      </div>
+
+      <input type="hidden" formControlName="realizouAvaliacao">
+      <input type="hidden" formControlName="tipoUsuario">
+
+      <div *ngIf="errorMessage" class="server-error">
+        {{ errorMessage }}
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-submit" [disabled]="cadastroForm.invalid || loading">
+          {{ loading ? 'SALVANDO...' : 'EFETUAR CADASTRO' }}
+        </button>
+        <a routerLink="/" class="btn-cancel">Cancelar</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DE SUCESSO E MATRÍCULA -->
+<div class="modal-overlay" *ngIf="showSuccessModal">
+  <div class="modal-card">
+    <div class="modal-icon">🎉</div>
+    <h3>CADASTRO REALIZADO!</h3>
+    <p>O aluno foi cadastrado com sucesso na Power Shape.</p>
+    
+    <div class="matricula-box">
+      <span class="label">NÚMERO DE MATRÍCULA</span>
+      <span class="value">{{ matriculaGerada }}</span>
+    </div>
+
+    <button class="btn-modal" (click)="fecharModalEIrParaLogin()">IR PARA O LOGIN</button>
+  </div>
+</div>

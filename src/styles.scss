@@ -1,1 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+// Variáveis Baseadas no Logo Power Shape
+$primary-color: #ff8c00;    // Laranja da logo
+$secondary-color: #000000;  // Preto predominante
+$bg-light: #111111;         // Cinza quase preto para fundos
+$text-light: #ffffff;       // Branco para textos e detalhes
+$font-main: 'Oswald', sans-serif; // Sugestão: Oswald combina com estética de academia
+// No styles.scss
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1; // Isso empurra o footer para o fundo da tela
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-main;
+  background-color: $secondary-color; // Fundo preto como na logo
+  color: $text-light;
+}

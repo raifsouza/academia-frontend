@@ -1,0 +1,69 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="logotransparente.png" alt="Power Shape Logo" class="login-logo">
+      <h2>ÁREA DO ALUNO</h2>
+      <p>Acesse seu painel para acompanhar treinos e pagamentos</p>
+    </div>
+
+    <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit()">
+      
+      <!-- E-mail ou Matrícula -->
+      <div class="form-group">
+        <label for="login">E-MAIL OU MATRICULA</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user"></i>
+          <input 
+            type="text" 
+            id="login" 
+            formControlName="login" 
+            placeholder="Digite seu e-mail ou matricula" 
+          >
+        </div>
+        <span class="error-msg" *ngIf="loginForm.get('login')?.touched && loginForm.get('login')?.invalid">
+          Informe seu e-mail ou número de matrícula.
+        </span>
+      </div>
+
+      <!-- Senha -->
+      <div class="form-group">
+        <label for="password">SENHA</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="senha" 
+            placeholder="Digite sua senha" 
+          >
+        </div>
+        <span class="error-msg" *ngIf="loginForm.get('senha')?.touched && loginForm.get('senha')?.invalid">
+          A senha é obrigatória.
+        </span>
+      </div>
+
+      <!-- Opções adicionais -->
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox"> Lembrar de mim
+        </label>
+        <a href="#" class="forgot-password">Esqueceu a senha?</a>
+      </div>
+
+      <!-- Erro vindo do Servidor -->
+      <div *ngIf="errorMessage" class="server-error">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botão de Login -->
+      <button type="submit" class="btn-login-submit" [disabled]="loginForm.invalid || loading">
+        {{ loading ? 'ENTRANDO...' : 'ENTRAR' }}
+      </button>
+
+    </form>
+
+    <div class="login-footer">
+      <p>Ainda não é aluno? <a routerLink="/cadastro" class="signup-link">Cadastre-se na recepção ou online</a></p>
+    </div>
+  </div>
+</div>

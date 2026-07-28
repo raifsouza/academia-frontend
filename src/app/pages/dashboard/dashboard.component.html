@@ -1,0 +1,37 @@
+<div class="dashboard-container" *ngIf="usuarioLogado">
+
+  <!-- 1. COMPONENTE CARD DE PERFIL -->
+  <app-user-profile-card [usuario]="usuarioLogado"></app-user-profile-card>
+
+  <hr class="divider">
+
+  <!-- 2. NAVEGAÇÃO ENTRE ABAS -->
+  <nav class="nav-tabs">
+    <button *ngIf="isAluno()" class="tab-btn" [class.active]="abaAtiva === 'treino'" (click)="selecionarAba('treino')">
+      Treino
+    </button>
+
+    <button *ngIf="isAluno() || isAdmin()" class="tab-btn" [class.active]="abaAtiva === 'historico'" (click)="selecionarAba('historico')">
+      Histórico de Pagamento
+    </button>
+
+    <button *ngIf="isProfessor() || isAdmin()" class="tab-btn" [class.active]="abaAtiva === 'alunos'" (click)="selecionarAba('alunos')">
+      Gestão de Alunos
+    </button>
+  </nav>
+
+  <!-- 3. EXIBIÇÃO DE CONTEÚDO DAS ABAS -->
+  <main class="tab-content">
+    
+    <!-- ABA TREINOS -->
+    <app-treinos-section *ngIf="abaAtiva === 'treino'" [usuario]="usuarioLogado"></app-treinos-section>
+
+    <!-- ABA HISTÓRICO DE PAGAMENTO -->
+    <app-pagamentos-section *ngIf="abaAtiva === 'historico'" [usuario]="usuarioLogado"></app-pagamentos-section>
+
+    <!-- ABA GESTÃO DE ALUNOS (Professor / Admin) -->
+    <app-treinos-section *ngIf="abaAtiva === 'alunos'" [usuario]="usuarioLogado" [modoGestao]="true"></app-treinos-section>
+
+  </main>
+
+</div>

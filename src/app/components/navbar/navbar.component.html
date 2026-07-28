@@ -1,0 +1,20 @@
+<header class="navbar">
+  <div class="logo-container">
+    <img routerLink="/" src="logo.jpg" alt="Power Shape Logo" class="logo-img">
+    <div routerLink="/" class="logo-text">POWER <span>SHAPE</span></div>
+  </div>
+
+  <nav class="nav-links"> 
+    <!-- EXIBIDO APENAS QUANDO NÃO ESTIVER LOGADO -->
+    <ng-template #visitante>
+      <button class="btn-login" routerLink="/login">LOGIN</button>
+      <button class="btn-signup" routerLink="/cadastro">INSCREVER-SE</button>
+    </ng-template>
+
+    <!-- EXIBIDO QUANDO ESTIVER LOGADO -->
+    <ng-container *ngIf="usuarioLogado$ | async as usuario; else visitante">
+      <button class="btn-login" routerLink="/dashboard">ÁREA DO ALUNO</button>
+      <button class="btn-signup" (click)="logout()">SAIR</button>
+    </ng-container>
+  </nav>
+</header>

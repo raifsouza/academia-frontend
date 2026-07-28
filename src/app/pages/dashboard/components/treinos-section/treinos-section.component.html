@@ -1,0 +1,170 @@
+<!-- VISÃO 1: APENAS MEUS TREINOS (ALUNO) -->
+<div *ngIf="!modoGestao" class="content-section">
+  <h3>MEUS TREINOS</h3>
+
+  <div *ngIf="loadingTreinos" class="loading-text">Carregando treinos...</div>
+
+  <div *ngIf="!loadingTreinos && treinosDoAluno.length === 0" class="empty-state">
+    Nenhum treino cadastrado até o momento.
+  </div>
+
+  <div class="treinos-grid" *ngIf="!loadingTreinos && treinosDoAluno.length > 0">
+    <div class="treino-card" *ngFor="let t of treinosDoAluno">
+      <div class="treino-header">
+        <h4>{{ t.titulo }}</h4>
+        <span class="dia-tag">{{ t.dia_semana }}</span>
+      </div>
+      <p class="treino-desc">{{ t.descricao }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- VISÃO 2: GESTÃO DE ALUNOS E TREINOS (PROFESSOR / ADMIN) -->
+<div *ngIf="modoGestao" class="gestion-layout">
+
+  <!-- Painel Esquerdo: Lista de Alunos -->
+  <div class="alunos-panel">
+    <h3>LISTA DE ALUNOS</h3>
+
+    <div class="busca-container">
+      <input 
+        type="text" 
+        [(ngModel)]="filtroAluno" 
+        placeholder="Buscar aluno..." 
+        class="input-search"
+      />
+    </div>
+
+    <div *ngIf="loadingAlunos" class="loading-text">Carregando alunos...</div>
+
+    <ul class="alunos-list" *ngIf="!loadingAlunos && alunos.length > 0">
+      <li *ngFor="let a of alunosFiltrados()" [class.selected]="alunoSelecionado?.id === a.id" (click)="selecionarAlunoParaTreino(a)">
+        <div class="aluno-info">
+          <strong>{{ a.nome }}</strong>
+          <small>Matrícula: {{ a.matricula || 'N/A' }} | {{ formatarTelefone(a.telefone) }}</small>
+        </div>
+        <span class="arrow">➔</span>
+      </li>
+    </ul>
+
+    <div *ngIf="!loadingAlunos && alunos.length === 0" class="empty-text">
+      Nenhum aluno encontrado.
+    </div>
+  </div>
+
+  <!-- Painel Direito: Treinos do Aluno Selecionado -->
+  <div class="treinos-panel">
+    <div class="panel-header" *ngIf="alunoSelecionado">
+      <h3>TREINOS DE: <span class="highlight">{{ alunoSelecionado.nome }}</span></h3>
+      <button class="btn-add-treino" (click)="abrirModalNovoTreino()">+ Adicionar Treino</button>
+    </div>
+
+    <div *ngIf="!alunoSelecionado" class="empty-state">
+      Selecione um aluno da lista ao lado para visualizar e adicionar treinos.
+    </div>
+
+    <div *ngIf="alunoSelecionado && loadingTreinos" class="loading-text">
+      Carregando treinos do aluno...
+    </div>
+
+    <div *ngIf="alunoSelecionado && !loadingTreinos && treinosDoAluno.length === 0" class="empty-state">
+      Este aluno ainda não possui treinos cadastrados.
+    </div>
+
+    <div class="treinos-grid" *ngIf="alunoSelecionado && !loadingTreinos && treinosDoAluno.length > 0">
+      <div class="treino-card" *ngFor="let t of treinosDoAluno">
+        <div class="treino-header">
+          <h4>{{ t.titulo }}</h4>
+          <span class="dia-tag">{{ t.dia_semana }}</span>
+        </div>
+
+        <p class="treino-desc">{{ t.descricao }}</p>
+
+        <div class="treino-actions">
+          <button class="btn-edit" (click)="abrirModalEdicao(t)">✏️ Editar</button>
+          <button class="btn-delete" (click)="excluirTreino(t.id!)">🗑️ Excluir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL CADASTRAR TREINO -->
+<div class="modal-overlay" *ngIf="modalNovoAberto">
+  <div class="modal-card">
+    <h3>CADASTRAR TREINO</h3>
+    <p>Aluno: <strong>{{ alunoSelecionado?.nome }}</strong></p>
+
+    <form [formGroup]="treinoForm" (ngSubmit)="salvarNovoTreino()">
+      <div class="form-group">
+        <label>TÍTULO DO TREINO *</label>
+        <input type="text" formControlName="titulo" placeholder="Ex: Treino A - Peito e Tríceps">
+      </div>
+
+      <div class="form-group">
+        <label>DIA DA SEMANA *</label>
+        <select formControlName="dia_semana">
+          <option value="Segunda-feira">Segunda-feira</option>
+          <option value="Terça-feira">Terça-feira</option>
+          <option value="Quarta-feira">Quarta-feira</option>
+          <option value="Quinta-feira">Quinta-feira</option>
+          <option value="Sexta-feira">Sexta-feira</option>
+          <option value="Sábado">Sábado</option>
+          <option value="Geral">Geral</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>DESCRIÇÃO DOS EXERCÍCIOS *</label>
+        <textarea formControlName="descricao" rows="5" placeholder="1. Supino Reto - 4x10..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-save" [disabled]="treinoForm.invalid || salvandoTreino">
+          {{ salvandoTreino ? 'SALVANDO...' : 'SALVAR TREINO' }}
+        </button>
+        <button type="button" class="btn-cancel" (click)="fecharModalNovoTreino()">CANCELAR</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL EDITAR TREINO -->
+<div class="modal-overlay" *ngIf="modalEdicaoAberto">
+  <div class="modal-card">
+    <h3>EDITAR TREINO</h3>
+
+    <form (ngSubmit)="salvarEdicaoTreino()">
+      <div class="form-group">
+        <label>TÍTULO DO TREINO</label>
+        <input type="text" [(ngModel)]="treinoEmEdicao.titulo" name="titulo" required />
+      </div>
+
+      <div class="form-group">
+        <label>DIA DA SEMANA</label>
+        <select [(ngModel)]="treinoEmEdicao.dia_semana" name="dia_semana" required>
+          <option value="Segunda-feira">Segunda-feira</option>
+          <option value="Terça-feira">Terça-feira</option>
+          <option value="Quarta-feira">Quarta-feira</option>
+          <option value="Quinta-feira">Quinta-feira</option>
+          <option value="Sexta-feira">Sexta-feira</option>
+          <option value="Sábado">Sábado</option>
+          <option value="Domingo">Domingo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>DESCRIÇÃO / EXERCÍCIOS</label>
+        <textarea rows="5" [(ngModel)]="treinoEmEdicao.descricao" name="descricao" required></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="fecharModalEdicao()">CANCELAR</button>
+        <button type="submit" class="btn-save" [disabled]="salvandoTreino">
+          {{ salvandoTreino ? 'SALVANDO...' : 'SALVAR ALTERAÇÕES' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

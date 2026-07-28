@@ -1,0 +1,161 @@
+<!-- VISÃO PARA GESTOR (ADMIN OU PROFESSOR) -->
+<div class="pagamentos-wrapper" *ngIf="isGestor()">
+  
+  <!-- COLUNA DA ESQUERDA: LISTA DE ALUNOS -->
+  <div class="card-sidebar">
+    <h3 class="title-orange">LISTA DE ALUNOS</h3>
+
+    <div class="busca-container">
+      <input 
+        type="text" 
+        [(ngModel)]="filtroAluno" 
+        placeholder="Buscar aluno..." 
+        class="input-search"
+      />
+    </div>
+
+    <div class="alunos-list">
+      <div 
+        *ngFor="let aluno of alunosFiltrados()" 
+        class="aluno-item"
+        [class.active]="alunoSelecionado?.id === aluno.id"
+        (click)="selecionarAluno(aluno)"
+      >
+        <div class="aluno-detalhes">
+          <strong class="aluno-nome">{{ aluno.nome }}</strong>
+          <span class="aluno-sub">
+            Matrícula: {{ aluno.matricula }} <ng-container *ngIf="aluno.telefone">| {{ formatarTelefone(aluno.telefone) }}</ng-container>
+          </span>
+        </div>
+        <span class="arrow-icon">➔</span>
+      </div>
+
+      <div *ngIf="alunosFiltrados().length === 0" class="empty-list">
+        Nenhum aluno encontrado.
+      </div>
+    </div>
+  </div>
+
+  <!-- COLUNA DA DIREITA: DETALHES DE PAGAMENTO -->
+  <div class="card-main">
+    
+    <!-- SE NENHUM ALUNO ESTIVER SELECIONADO -->
+    <div class="empty-selection" *ngIf="!alunoSelecionado">
+      <p>Selecione um aluno da lista ao lado para visualizar e adicionar pagamentos.</p>
+    </div>
+
+    <!-- CONTEÚDO QUANDO ALUNO É SELECIONADO -->
+    <div class="detalhes-content" *ngIf="alunoSelecionado">
+      <div class="section-header">
+        <h3>HISTÓRICO DE PAGAMENTOS DE {{ alunoSelecionado.nome | uppercase }}</h3>
+        <button class="btn-add" (click)="abrirModal()">
+          + Registrar Pagamento
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="loading-text">Carregando pagamentos...</div>
+
+      <!-- TABELA -->
+      <table class="tabela-pagamentos" *ngIf="!loading && pagamentos.length > 0">
+        <thead>
+          <tr>
+            <th>Mês de Referência</th>
+            <th>Data</th>
+            <th>Valor</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of pagamentos">
+            <td>{{ p.mes_referencia }}</td>
+            <td>{{ p.data_pagamento | date:'dd/MM/yyyy' }}</td>
+            <td>{{ p.valor | currency:'BRL':'symbol':'1.2-2' }}</td>
+            <td>
+              <span class="badge" [ngClass]="p.status ? p.status.toLowerCase() : ''">{{ p.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p *ngIf="!loading && pagamentos.length === 0" class="empty-state">
+        Nenhum histórico de pagamento registrado para este aluno.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- VISÃO EXCLUSIVA DO ALUNO LOGADO -->
+<div class="pagamentos-container-aluno" *ngIf="!isGestor()">
+  <div class="section-header">
+    <h3>MEU HISTÓRICO DE PAGAMENTOS</h3>
+  </div>
+
+  <div *ngIf="loading" class="loading-text">Carregando pagamentos...</div>
+
+  <table class="tabela-pagamentos" *ngIf="!loading && pagamentos.length > 0">
+    <thead>
+      <tr>
+        <th>Mês de Referência</th>
+        <th>Data</th>
+        <th>Valor</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of pagamentos">
+        <td>{{ p.mes_referencia }}</td>
+        <td>{{ p.data_pagamento | date:'dd/MM/yyyy' }}</td>
+        <td>{{ p.valor | currency:'BRL':'symbol':'1.2-2' }}</td>
+        <td>
+          <span class="badge" [ngClass]="p.status ? p.status.toLowerCase() : ''">{{ p.status }}</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && pagamentos.length === 0" class="empty-state">
+    Nenhum histórico de pagamento encontrado.
+  </p>
+</div>
+
+<!-- MODAL NOVO PAGAMENTO -->
+<div class="modal-overlay" *ngIf="modalAberto">
+  <div class="modal-card">
+    <h3>REGISTRAR PAGAMENTO</h3>
+    <p class="sub-modal" *ngIf="alunoSelecionado">
+      Aluno: <strong>{{ alunoSelecionado.nome }}</strong> (Matrícula: {{ alunoSelecionado.matricula }})
+    </p>
+
+    <form (ngSubmit)="salvar()">
+      <div class="form-group">
+        <label>Mês de Referência</label>
+        <input type="text" [(ngModel)]="novoPagamento.mes_referencia" name="mes_ref" placeholder="Ex: Março / 2026" required />
+      </div>
+
+      <div class="form-group">
+        <label>Valor (R$)</label>
+        <input type="number" step="0.01" [(ngModel)]="novoPagamento.valor" name="valor" required />
+      </div>
+
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" [(ngModel)]="novoPagamento.data_pagamento" name="data" required />
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="novoPagamento.status" name="status">
+          <option value="PAGO">PAGO</option>
+          <option value="PENDENTE">PENDENTE</option>
+          <option value="CANCELADO">CANCELADO</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="fecharModal()">CANCELAR</button>
+        <button type="submit" class="btn-save">SALVAR</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<header class="profile-card" *ngIf="usuario">
+    <div class="avatar-container" (click)="fileInput.click()" title="Clique para alterar a foto de perfil">
+        <img [src]="fotoProcessada" (error)="onImageError($event)" [alt]="usuario?.nome || 'Foto de Perfil'"
+            class="profile-avatar" />
+
+        <!-- Subcamada com ícone ao passar o mouse -->
+        <div class="avatar-overlay">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+        </div>
+
+        <!-- Indicator de carregamento -->
+        <div class="loading-spinner" *ngIf="carregandoFoto">
+            <span>...</span>
+        </div>
+    </div>
+
+    <!-- Input file invisível ativado via referência (#fileInput) -->
+    <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
+
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="label">Nome:</span>
+            <span class="value">{{ usuario.nome }}</span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">Matrícula:</span>
+            <span class="value">{{ usuario.matricula || 'N/A' }}</span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">Cargo/Perfil:</span>
+            <span class="value">
+                {{ usuario.tipo_usuario === 1 ? 'Administrador' : usuario.tipo_usuario === 2 ? 'Professor' : 'Aluno' }}
+            </span>
+        </div>
+
+        <div class="info-item" *ngIf="usuario.tipo_usuario === 3">
+            <span class="label">Telefone:</span>
+            <span class="value">{{ formatarTelefone(usuario.telefone) }}</span>
+        </div>
+
+        <div class="info-item" *ngIf="usuario.tipo_usuario === 3">
+            <span class="label">Data de Cadastro:</span>
+            <span class="value">{{ usuario.data_cadastro | date:'dd/MM/yyyy' }}</span>
+        </div>
+
+        <div class="info-item" *ngIf="usuario.tipo_usuario === 3">
+            <span class="label">Dia de Vencimento:</span>
+            <span class="value">Dia {{ getDiaVencimento(usuario.data_vencimento) }}</span>
+        </div>
+    </div>
+</header>
