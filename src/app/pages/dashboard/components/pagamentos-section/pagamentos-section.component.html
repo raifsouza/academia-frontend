@@ -38,24 +38,20 @@
 
   <!-- COLUNA DA DIREITA: DETALHES DE PAGAMENTO -->
   <div class="card-main">
-    
-    <!-- SE NENHUM ALUNO ESTIVER SELECIONADO -->
     <div class="empty-selection" *ngIf="!alunoSelecionado">
       <p>Selecione um aluno da lista ao lado para visualizar e adicionar pagamentos.</p>
     </div>
 
-    <!-- CONTEÚDO QUANDO ALUNO É SELECIONADO -->
     <div class="detalhes-content" *ngIf="alunoSelecionado">
       <div class="section-header">
         <h3>HISTÓRICO DE PAGAMENTOS DE {{ alunoSelecionado.nome | uppercase }}</h3>
-        <button class="btn-add" (click)="abrirModal()">
+        <button class="btn-add" (click)="abrirModalGestor()">
           + Registrar Pagamento
         </button>
       </div>
 
       <div *ngIf="loading" class="loading-text">Carregando pagamentos...</div>
 
-      <!-- TABELA -->
       <table class="tabela-pagamentos" *ngIf="!loading && pagamentos.length > 0">
         <thead>
           <tr>
@@ -63,6 +59,7 @@
             <th>Data</th>
             <th>Valor</th>
             <th>Status</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -72,6 +69,18 @@
             <td>{{ p.valor | currency:'BRL':'symbol':'1.2-2' }}</td>
             <td>
               <span class="badge" [ngClass]="p.status ? p.status.toLowerCase() : ''">{{ p.status }}</span>
+              <span *ngIf="p.status === 'PENDENTE' && calcularDiasParaVencer(p.data_pagamento) >= 0 && calcularDiasParaVencer(p.data_pagamento) <= 10" class="badge badge-warning">
+                Vence em {{ calcularDiasParaVencer(p.data_pagamento) === 0 ? 'hoje' : calcularDiasParaVencer(p.data_pagamento) + 'd' }}
+              </span>
+            </td>
+            <td>
+              <button 
+                *ngIf="p.status === 'PAGO'" 
+                class="btn-receipt" 
+                (click)="gerarRecibo(p, alunoSelecionado)"
+                title="Baixar Recibo">
+                📄 Recibo
+              </button>
             </td>
           </tr>
         </tbody>
@@ -81,14 +90,55 @@
         Nenhum histórico de pagamento registrado para este aluno.
       </p>
     </div>
-
   </div>
 </div>
 
 <!-- VISÃO EXCLUSIVA DO ALUNO LOGADO -->
 <div class="pagamentos-container-aluno" *ngIf="!isGestor()">
+
+  <!-- BANNERS DE ALERTA DE VENCIMENTO E INADIMPLÊNCIA -->
+  
+  <!-- ALERTA DE PRÓXIMO DO VENCIMENTO (ATÉ O DIA) -->
+  <div class="alert-banner alert-warning" *ngIf="alertaStatus === 'A_VENCER'">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-text">
+      <strong>Atenção ao Vencimento!</strong>
+      <span>
+        Sua mensalidade deste mês vence {{ diasParaVencimento === 0 ? 'hoje' : 'em ' + diasParaVencimento + ' dia(s)' }} (dia {{ diaVencimentoAluno }}). Realize o pagamento para evitar bloqueios.
+      </span>
+    </div>
+    <button class="btn-alert-pay" (click)="abrirModalAluno()">PAGAR AGORA</button>
+  </div>
+
+  <!-- ALERTA DE MENSALIDADE PENDENTE (ENTRE 1 E 5 DIAS DE ATRASO) -->
+  <div class="alert-banner alert-orange" *ngIf="alertaStatus === 'PENDENTE'">
+    <span class="alert-icon">⏳</span>
+    <div class="alert-text">
+      <strong>Mensalidade Pendente</strong>
+      <span>
+        Sua mensalidade venceu no dia {{ diaVencimentoAluno }} (há {{ diasAtraso }} dia(s)). Regularize até o 5º dia de atraso para evitar o status de inadimplência.
+      </span>
+    </div>
+    <button class="btn-alert-pay" (click)="abrirModalAluno()">REGULARIZAR</button>
+  </div>
+
+  <!-- ALERTA DE INADIMPLÊNCIA (MAIS DE 5 DIAS DE ATRASO) -->
+  <div class="alert-banner alert-danger" *ngIf="alertaStatus === 'INADIMPLENTE'">
+    <span class="alert-icon">🚨</span>
+    <div class="alert-text">
+      <strong>STATUS: INADIMPLENTE</strong>
+      <span>
+        Sua mensalidade está atrasada há {{ diasAtraso }} dias (venceu dia {{ diaVencimentoAluno }}). Regularize seu pagamento imediatamente para liberar o uso da academia.
+      </span>
+    </div>
+    <button class="btn-alert-pay danger-btn" (click)="abrirModalAluno()">PAGAR MENSALIDADE</button>
+  </div>
+
   <div class="section-header">
     <h3>MEU HISTÓRICO DE PAGAMENTOS</h3>
+    <button class="btn-add" (click)="abrirModalAluno()">
+      💳 PAGAR MENSALIDADE (R$ 80,00)
+    </button>
   </div>
 
   <div *ngIf="loading" class="loading-text">Carregando pagamentos...</div>
@@ -100,6 +150,7 @@
         <th>Data</th>
         <th>Valor</th>
         <th>Status</th>
+        <th>Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -109,6 +160,17 @@
         <td>{{ p.valor | currency:'BRL':'symbol':'1.2-2' }}</td>
         <td>
           <span class="badge" [ngClass]="p.status ? p.status.toLowerCase() : ''">{{ p.status }}</span>
+          <span *ngIf="p.status === 'PENDENTE' && calcularDiasParaVencer(p.data_pagamento) >= 0 && calcularDiasParaVencer(p.data_pagamento) <= 10" class="badge badge-warning">
+          </span>
+        </td>
+        <td>
+          <button 
+            *ngIf="p.status === 'PAGO'" 
+            class="btn-receipt" 
+            (click)="gerarRecibo(p, usuario)"
+            title="Baixar Recibo">
+            📄 Recibo
+          </button>
         </td>
       </tr>
     </tbody>
@@ -119,7 +181,7 @@
   </p>
 </div>
 
-<!-- MODAL NOVO PAGAMENTO -->
+<!-- MODAL REGISTRO GESTOR -->
 <div class="modal-overlay" *ngIf="modalAberto">
   <div class="modal-card">
     <h3>REGISTRAR PAGAMENTO</h3>
@@ -130,7 +192,7 @@
     <form (ngSubmit)="salvar()">
       <div class="form-group">
         <label>Mês de Referência</label>
-        <input type="text" [(ngModel)]="novoPagamento.mes_referencia" name="mes_ref" placeholder="Ex: Março / 2026" required />
+        <input type="text" [(ngModel)]="novoPagamento.mes_referencia" name="mes_ref" placeholder="Ex: Julho / 2026" required />
       </div>
 
       <div class="form-group">
@@ -157,5 +219,82 @@
         <button type="submit" class="btn-save">SALVAR</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- MODAL DE PAGAMENTO DO ALUNO (PIX / CARTÃO) -->
+<div class="modal-overlay" *ngIf="modalAlunoAberto">
+  <div class="modal-card modal-checkout">
+    <h3>REALIZAR PAGAMENTO</h3>
+    <p class="sub-modal">Valor da Mensalidade: <strong class="valor-destaque">R$ 80,00</strong></p>
+
+    <!-- ABAS DE FORMA DE PAGAMENTO -->
+    <div class="payment-tabs">
+      <button 
+        type="button" 
+        [class.active]="metodoPagamento === 'PIX'" 
+        (click)="metodoPagamento = 'PIX'">
+        ⚡ PIX
+      </button>
+      <button 
+        type="button" 
+        [class.active]="metodoPagamento === 'CARTAO'" 
+        (click)="metodoPagamento = 'CARTAO'">
+        💳 Cartão de Crédito
+      </button>
+    </div>
+
+    <!-- MÊS DE REFERÊNCIA -->
+    <div class="form-group">
+      <label>Mês de Referência</label>
+      <input type="text" [(ngModel)]="novoPagamento.mes_referencia" placeholder="Ex: Julho / 2026" />
+    </div>
+
+    <!-- CONTEÚDO PIX -->
+    <div *ngIf="metodoPagamento === 'PIX'" class="checkout-body pix-box">
+      <p class="pix-instruction">Escaneie o QR Code ou copie a chave PIX abaixo:</p>
+      
+      <div class="qr-placeholder">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126580014BR.GOV.BCB.PIX0136powershape%40academia.com.br520400005303986540580.005802BR5911POWER%20SHAPE6005BELEM62070503***6304E21A" alt="QR Code Pix" />
+      </div>
+
+      <div class="pix-copy-wrapper">
+        <input type="text" readonly [value]="chavePix" class="input-pix-code" />
+        <button type="button" class="btn-copy" (click)="copiarChavePix()">
+          {{ pixCopiado ? 'COPIADO! ✓' : 'COPIAR' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO CARTÃO DE CRÉDITO -->
+    <div *ngIf="metodoPagamento === 'CARTAO'" class="checkout-body">
+      <div class="form-group">
+        <label>Número do Cartão</label>
+        <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" [(ngModel)]="dadosCartao.numero" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Validade</label>
+          <input type="text" placeholder="MM/AA" maxlength="5" [(ngModel)]="dadosCartao.validade" />
+        </div>
+        <div class="form-group">
+          <label>CVV</label>
+          <input type="text" placeholder="123" maxlength="4" [(ngModel)]="dadosCartao.cvv" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Nome no Cartão</label>
+        <input type="text" placeholder="NOME COMO NO CARTÃO" [(ngModel)]="dadosCartao.nome" />
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" (click)="fecharModalAluno()">CANCELAR</button>
+      <button type="button" class="btn-save" (click)="confirmarPagamentoAluno()" [disabled]="processandoPagamento">
+        {{ processandoPagamento ? 'PROCESSANDO...' : 'CONFIRMAR PAGAMENTO' }}
+      </button>
+    </div>
   </div>
 </div>
