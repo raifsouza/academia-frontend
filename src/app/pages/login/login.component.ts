@@ -39,7 +39,6 @@ export class LoginComponent implements OnInit {
       this.usuarioService.login(credenciais).subscribe({
         next: (res) => {
           this.loading = false;
-          
           // Guarda as informações do usuário autenticado na sessão (localStorage)
           localStorage.setItem('usuario_logado', JSON.stringify(res.usuario));
 

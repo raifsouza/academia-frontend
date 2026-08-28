@@ -1,0 +1,803 @@
+// ==========================================
+// VARIÁVEIS DO TEMA POWER SHAPE
+// ==========================================
+$bg-dark-primary: #121212;
+$bg-dark-secondary: #1e1e1e;
+$bg-dark-card: #252525;
+$bg-dark-input: #2d2d2d;
+
+$orange-primary: #ff8c00;
+$orange-hover: #e07b00;
+$orange-glow: rgba(255, 140, 0, 0.25);
+
+$text-primary: #ffffff;
+$text-secondary: #a0a0a0;
+$text-muted: #6c757d;
+
+$border-color: #333333;
+$border-focus: #ff8c00;
+$radius: 8px;
+$transition: all 0.3s ease;
+
+// ==========================================
+// ESTRUTURA PRINCIPAL
+// ==========================================
+.avaliacao-container {
+  background-color: $bg-dark-primary;
+  color: $text-primary;
+  border-radius: $radius;
+  padding: 24px;
+  border: 1px solid $border-color;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  // --- CABEÇALHO DO ALUNO ---
+  .header-aluno {
+    display: flex;
+    gap: 16px;
+    background: $bg-dark-secondary;
+    padding: 16px;
+    border-radius: $radius;
+    border: 1px solid $border-color;
+    margin-bottom: 24px;
+
+    .info-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: $orange-primary;
+        letter-spacing: 0.5px;
+      }
+
+      input, select {
+        padding: 10px 12px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        background-color: $bg-dark-input;
+        color: $text-primary;
+        font-size: 14px;
+        outline: none;
+        transition: $transition;
+
+        &:focus {
+          border-color: $orange-primary;
+          box-shadow: 0 0 8px $orange-glow;
+        }
+
+        &[readonly] {
+          background-color: transparent;
+          border-color: transparent;
+          color: $text-secondary;
+          font-weight: 600;
+        }
+      }
+    }
+
+    // --- NOVO: BUSCA REATIVA COM DROPDOWN DE SUGESTÕES ---
+    .busca-wrapper {
+      position: relative;
+
+      .dropdown-sugestoes {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: $bg-dark-card;
+        border: 1px solid $border-focus;
+        border-radius: 0 0 $radius $radius;
+        margin: 4px 0 0 0;
+        padding: 0;
+        list-style: none;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+
+        li {
+          padding: 10px 14px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          border-bottom: 1px solid $border-color;
+          transition: $transition;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &:hover {
+            background-color: $bg-dark-input;
+
+            .nome-aluno {
+              color: $orange-primary;
+            }
+          }
+
+          .badge-matricula {
+            background: $bg-dark-input;
+            color: $orange-primary;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid $border-color;
+          }
+
+          .nome-aluno {
+            font-size: 13px;
+            color: $text-primary;
+          }
+        }
+      }
+    }
+
+    .flex-grow {
+      flex: 1;
+    }
+  }
+
+  // --- NAVEGAÇÃO ENTRE ABAS ---
+  .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 2px solid $border-color;
+    margin-bottom: 24px;
+    padding-bottom: 4px;
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      font-size: 14px;
+      color: $text-secondary;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      transition: $transition;
+
+      &:hover {
+        color: $orange-primary;
+        background-color: rgba(255, 140, 0, 0.05);
+      }
+
+      &.active {
+        color: $orange-primary;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -6px;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background-color: $orange-primary;
+          border-radius: 3px 3px 0 0;
+          box-shadow: 0 -2px 8px $orange-glow;
+        }
+      }
+    }
+  }
+
+  // --- SUB-ABAS (Ex: Anamnese / PAR-Q) ---
+  .sub-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    button {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid $border-color;
+      background: $bg-dark-secondary;
+      color: $text-secondary;
+      font-size: 13px;
+      cursor: pointer;
+      transition: $transition;
+
+      &.active, &:hover {
+        background: $orange-primary;
+        color: #000;
+        font-weight: 700;
+        border-color: $orange-primary;
+      }
+    }
+  }
+
+  // --- CORPO DAS ABAS ---
+  .tab-pane {
+    min-height: 360px;
+    background: $bg-dark-secondary;
+    padding: 20px;
+    border-radius: $radius;
+    border: 1px solid $border-color;
+
+    h3, h4 {
+      color: $orange-primary;
+      margin-bottom: 16px;
+      margin-top: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+    
+
+    button {
+      padding: 6px 16px;
+      margin-right: 15px;
+      border-radius: 20px;
+      border: 1px solid $border-color;
+      background: $bg-dark-secondary;
+      color: $text-secondary;
+      font-size: 13px;
+      cursor: pointer;
+      transition: $transition;
+
+      &.active, &:hover {
+        background: $orange-primary;
+        color: #000;
+        font-weight: 700;
+        border-color: $orange-primary;
+      }
+    }
+
+    // --- NOVO: LAYOUT DE COLUNAS LADO A LADO (RISCO / PERÍMETROS) ---
+    &.split-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+
+      .result-column {
+        display: flex;
+        flex-direction: column;
+
+        .risco-card, .rcq-card {
+          background: $bg-dark-card;
+          border: 1px solid $border-color;
+          border-radius: $radius;
+          padding: 16px;
+          height: 25%;
+
+          .status-msg {
+            font-size: 13px;
+            color: $text-secondary;
+            margin-bottom: 12px;
+            font-style: italic;
+          }
+
+          .escala-risco {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            li {
+              font-size: 12px;
+              color: $text-secondary;
+
+              span {
+                color: $orange-primary;
+                font-weight: 700;
+              }
+            }
+          }
+
+          .rcq-val {
+            font-size: 36px;
+            font-weight: 700;
+            color: $orange-primary;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+          }
+        }
+      }
+    }
+
+    // Formulários
+    .form-grid, .form-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group, .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 13px;
+        color: $text-secondary;
+      }
+
+      select {
+        padding: 10px;
+        background: $bg-dark-input;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        color: $text-primary;
+        font-size: 14px;
+        transition: $transition;
+        
+        &:focus {
+          border-color: $orange-primary;
+          box-shadow: 0 0 6px $orange-glow;
+        }
+
+        &[readonly] {
+          opacity: 0.8;
+          cursor: not-allowed;
+        }
+      }
+
+      input, textarea {
+        padding: 10px;
+        background: $bg-dark-input;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        color: $text-primary;
+        font-size: 14px;
+        transition: $transition;
+        
+        &:focus {
+          border-color: $orange-primary;
+          box-shadow: 0 0 6px $orange-glow;
+        }
+
+        &[readonly] {
+          opacity: 0.8;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .neuro-item {
+      margin-bottom: 20px;
+
+      label {
+        margin-right: 15px;
+      }
+
+      input {
+        padding: 10px;
+        background: $bg-dark-input;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        color: $text-primary;
+        font-size: 14px;
+        transition: $transition;
+      }
+    }
+
+    .form-row {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      input {
+        width: 120px;
+        margin-bottom: 15px;
+        text-align: right;
+      }
+    }
+
+    // Checkboxes da Configuração
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+
+      input[type="checkbox"] {
+        accent-color: $orange-primary;
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      label {
+        font-size: 14px;
+        color: $text-primary;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .protocolo-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: $bg-dark-card;
+    padding: 16px;
+    border-radius: $radius;
+    border: 1px solid $border-color;
+    margin-bottom: 24px;
+
+    .field-group {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      flex: 1;
+      min-width: 180px;
+      
+      label {
+        font-size: 12px;
+        margin-right: 15px;
+        color: $orange-primary;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      select, input {
+        padding: 10px 12px;
+        background: $bg-dark-input;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        color: $text-primary;
+        font-size: 14px;
+        outline: none;
+
+        &:focus {
+          border-color: $orange-primary;
+          box-shadow: 0 0 8px $orange-glow;
+        }
+      }
+    }
+
+    .btn-calcular {
+      background: $orange-primary;
+      color: #000;
+      border: none;
+      padding: 11px 28px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: $transition;
+      box-shadow: 0 4px 12px $orange-glow;
+
+      &:hover {
+        background: $orange-hover;
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+
+  .composicao-resultados {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    grid-auto-flow: column;
+    .res-card {
+      background: $bg-dark-card;
+      border: 1px solid $border-color;
+      border-radius: $radius;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: $transition;
+
+      label {
+        font-size: 11px;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .val {
+        font-size: 22px;
+        font-weight: 700;
+        color: $text-primary;
+
+        small {
+          font-size: 12px;
+          color: $text-muted;
+          margin-left: 2px;
+        }
+      }
+
+      &.highlight {
+        border-color: $orange-primary;
+        background: linear-gradient(145deg, $bg-dark-card, #2d261f);
+
+        .val {
+          color: $orange-primary;
+        }
+      }
+    }
+  }
+}
+  // --- SEÇÕES ESPECÍFICAS ---
+
+  // Topo das medidas (Composição)
+  .medidas-topo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 12px;
+        color: $text-secondary;
+      }
+
+      input {
+        padding: 10px;
+        background: $bg-dark-input;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        color: $text-primary;
+      }
+    }
+
+    .result-box {
+      background: $bg-dark-card;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      label {
+        font-size: 11px;
+        color: $text-muted;
+        text-transform: uppercase;
+      }
+
+      strong {
+        font-size: 20px;
+        color: $orange-primary;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  // Galeria Postural
+  .postural-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+
+    .postural-card {
+      background: $bg-dark-card;
+      border: 1px solid $border-color;
+      padding: 16px;
+      border-radius: $radius;
+      text-align: center;
+
+      .img-placeholder {
+        width: 100%;
+        height: 260px;
+        background: $bg-dark-input;
+        border: 2px dashed $border-color;
+        border-radius: 6px;
+        margin: 12px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+
+      input[type="file"] {
+        font-size: 12px;
+        color: $text-secondary;
+        width: 100%;
+      }
+    }
+  }
+
+  // ==========================================
+  // ESTILOS ESPECÍFICOS: CARDIORRESPIRATÓRIA
+  // ==========================================
+  .cardio-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .cardio-header {
+      h3 {
+        color: $orange-primary;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .subtitle {
+        color: $text-secondary;
+        font-size: 13px;
+        margin: 0;
+      }
+    }
+
+    // --- GRID DOS 3 CARDS DE PROTOCOLO ---
+    .protocolos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+
+      .protocolo-card {
+        background: $bg-dark-card;
+        border: 1px solid $border-color;
+        border-radius: $radius;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        transition: $transition;
+
+        &:hover {
+          border-color: rgba(255, 140, 0, 0.4);
+        }
+
+        .card-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .icon {
+            font-size: 18px;
+          }
+
+          h4 {
+            color: $orange-primary;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 0;
+          }
+        }
+
+        .btn-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          .btn-protocolo {
+            background: $bg-dark-input;
+            border: 1px solid lighten($bg-dark-input, 10%);
+            border-radius: 6px;
+            color: lighten($text-secondary, 20%);
+            padding: 10px 14px;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              border-color: $orange-primary;
+              color: $text-primary;
+              background: lighten($bg-dark-input, 5%);
+            }
+
+            &.active {
+              background: $orange-glow;
+              border-color: $orange-primary;
+              color: $orange-primary;
+              font-weight: 600;
+              box-shadow: 0 0 8px $orange-glow;
+            }
+          }
+        }
+      }
+    }
+
+    // --- PAINEL DE RESULTADOS DO VO2 ---
+    .vo2-resultados-container {
+      background: $bg-dark-secondary;
+      border: 1px solid $border-color;
+      border-radius: $radius;
+      padding: 18px;
+
+      h4 {
+        color: $text-primary;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+
+      .vo2-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+
+        .vo2-card {
+          background: $bg-dark-card;
+          border: 1px solid $border-color;
+          border-radius: 6px;
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 6px;
+
+          &.accent {
+            border-color: rgba(255, 140, 0, 0.3);
+            background: linear-gradient(145deg, $bg-dark-card, #2d261f);
+          }
+
+          label {
+            color: $text-secondary;
+            font-size: 12px;
+            font-weight: 500;
+          }
+
+          .value-highlight {
+            color: $orange-primary;
+            font-size: 22px;
+            font-weight: 700;
+
+            small {
+              font-size: 11px;
+              color: $text-muted;
+              font-weight: 400;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // --- RODAPÉ E BOTÕES DE AÇÃO ---
+  .footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid $border-color;
+
+    .btn-save {
+      background: $orange-primary;
+      color: #000;
+      border: none;
+      padding: 12px 32px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px $orange-glow;
+      transition: $transition;
+
+      &:hover:not(:disabled) {
+        background: $orange-hover;
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        background: $border-color;
+        color: $text-muted;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+    }
+  }

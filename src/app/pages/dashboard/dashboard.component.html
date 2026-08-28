@@ -11,6 +11,11 @@
       Treino
     </button>
 
+    <!-- NOVO MENU: AVALIAÇÃO FÍSICA (Disponível para Aluno, Professor e Admin) -->
+    <button class="tab-btn" [class.active]="abaAtiva === 'avaliacao'" (click)="selecionarAba('avaliacao')">
+      Avaliação Física
+    </button>
+
     <button *ngIf="isAluno() || isAdmin()" class="tab-btn" [class.active]="abaAtiva === 'historico'" (click)="selecionarAba('historico')">
       Histórico de Pagamento
     </button>
@@ -25,6 +30,9 @@
     
     <!-- ABA TREINOS -->
     <app-treinos-section *ngIf="abaAtiva === 'treino'" [usuario]="usuarioLogado"></app-treinos-section>
+
+    <!-- ABA AVALIAÇÃO FÍSICA (NOVO) -->
+    <app-avaliacao-fisica *ngIf="abaAtiva === 'avaliacao'" [usuarioLogado]="usuarioLogado"></app-avaliacao-fisica>
 
     <!-- ABA HISTÓRICO DE PAGAMENTO -->
     <app-pagamentos-section *ngIf="abaAtiva === 'historico'" [usuario]="usuarioLogado"></app-pagamentos-section>

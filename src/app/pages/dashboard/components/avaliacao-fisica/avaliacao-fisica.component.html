@@ -1,0 +1,598 @@
+<div class="avaliacao-container">
+
+    <!-- CABEÇALHO COM INFORMAÇÕES DO ALUNO & BUSCA -->
+    <div class="header-aluno">
+        <!-- BUSCA COM DROPDOWN (GESTORES/PROFESSORES) -->
+        <div class="info-grupo flex-grow busca-wrapper" *ngIf="isGestor()">
+            <label for="input-busca-aluno">Buscar Aluno (Matrícula ou Nome)</label>
+            <input id="input-busca-aluno" type="text" class="form-control" [value]="termoBusca"
+                (input)="onDigitarBusca($event)" (blur)="fecharDropdownComDelay()"
+                placeholder="Digite a matrícula ou nome para pesquisar..." autocomplete="off" />
+
+            <!-- LISTA DE SUGESTÕES DA PESQUISA -->
+            <ul class="dropdown-sugestoes" *ngIf="mostrarDropdown">
+                <li *ngFor="let item of sugestoesAlunos" (mousedown)="selecionarAluno(item)">
+                    <span class="badge-matricula">{{ item.matricula }}</span>
+                    <span class="nome-aluno">{{ item.nome }}</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- VISUALIZAÇÃO DIRETA (QUANDO FOR O PRÓPRIO ALUNO LOGADO) -->
+        <ng-container *ngIf="!isGestor()">
+            <div class="info-grupo">
+                <label>Matrícula</label>
+                <input type="text" [value]="aluno?.matricula || ''" readonly />
+            </div>
+
+            <div class="info-grupo flex-grow">
+                <label>Nome do Aluno</label>
+                <input type="text" [value]="aluno?.nome || ''" readonly />
+            </div>
+        </ng-container>
+
+        <!-- SELEÇÃO DO NÚMERO DA AVALIAÇÃO -->
+        <div class="info-grupo">
+            <label for="select-num-avaliacao">Avaliação nº</label>
+            <select id="select-num-avaliacao" [(ngModel)]="avaliacao.numero_avaliacao" [disabled]="!isGestor()">
+                <option [ngValue]="1">1ª - {{ avaliacao.data_avaliacao | date:'dd/MM/yyyy' }}</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- NAVEGAÇÃO DAS ABAS PRINCIPAIS -->
+    <div class="nav-tabs">
+        <button [class.active]="abaAtiva === 'anamnese'" (click)="abaAtiva = 'anamnese'">Anamnese</button>
+        <button [class.active]="abaAtiva === 'risco'" (click)="abaAtiva = 'risco'">Risco Coronariano</button>
+        <button [class.active]="abaAtiva === 'perimetros'" (click)="abaAtiva = 'perimetros'">Perímetros / RCQ</button>
+        <button [class.active]="abaAtiva === 'composicao'" (click)="abaAtiva = 'composicao'">Composição</button>
+        <button [class.active]="abaAtiva === 'cardio'" (click)="abaAtiva = 'cardio'">Cardiorrespiratória</button>
+        <button [class.active]="abaAtiva === 'neuromotores'" (click)="abaAtiva = 'neuromotores'">Neuromotores</button>
+        <button [class.active]="abaAtiva === 'postural'" (click)="abaAtiva = 'postural'">Postural</button>
+        <button *ngIf="isGestor()" [class.active]="abaAtiva === 'config'"
+            (click)="abaAtiva = 'config'">Configuração</button>
+    </div>
+
+    <!-- CORPO DA AVALIAÇÃO -->
+    <div class="tab-content">
+
+        <!-- ABA 1: ANAMNESE -->
+        <div *ngIf="abaAtiva === 'anamnese'" class="tab-pane">
+            <div class="sub-tabs">
+                <button [class.active]="subAbaAnamnese === 'anamnese'"
+                    (click)="subAbaAnamnese = 'anamnese'">Anamnese</button>
+                <button [class.active]="subAbaAnamnese === 'parq'" (click)="subAbaAnamnese = 'parq'">PAR-Q</button>
+            </div>
+
+            <div *ngIf="subAbaAnamnese === 'anamnese' && avaliacao.anamnese" class="form-grid">
+                <div class="form-group">
+                    <label for="input-objetivos">Objetivos com relação à atividade física?</label>
+                    <input id="input-objetivos" type="text" [(ngModel)]="avaliacao.anamnese.objetivos"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-group">
+                    <label for="input-pratica">Pratica atividade física atualmente?</label>
+                    <input id="input-pratica" type="text" [(ngModel)]="avaliacao.anamnese.pratica_atividade"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-group">
+                    <label for="input-obs">Observações:</label>
+                    <textarea id="input-obs" [(ngModel)]="avaliacao.anamnese.observacoes" [readonly]="!isGestor()"
+                        rows="4"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 2: RISCO CORONARIANO -->
+        <div *ngIf="abaAtiva === 'risco' && avaliacao.risco_coronariano" class="tab-pane split-layout">
+            <div class="form-column">
+                <h3>Questionário de Risco</h3>
+
+                <div class="form-group">
+                    <label for="select-idade">Idade:</label>
+                    <select id="select-idade" [(ngModel)]="avaliacao.risco_coronariano.idade" [disabled]="!isGestor()">
+                        <option [ngValue]="1">10 a 20 anos (1 pt)</option>
+                        <option [ngValue]="2">21 a 30 anos (2 pts)</option>
+                        <option [ngValue]="3">31 a 40 anos (3 pts)</option>
+                        <option [ngValue]="4">41 a 50 anos (4 pts)</option>
+                        <option [ngValue]="6">51 a 60 anos (6 pts)</option>
+                        <option [ngValue]="8">61 anos ou mais (8 pts)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-sexo">Sexo:</label>
+                    <select id="select-sexo" [(ngModel)]="avaliacao.risco_coronariano.sexo" [disabled]="!isGestor()">
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-exercicio">Exercício Físico:</label>
+                    <select id="select-exercicio" [(ngModel)]="avaliacao.risco_coronariano.exercicio_fisico"
+                        [disabled]="!isGestor()">
+                        <option value="INTENSO">Intenso e regular</option>
+                        <option value="MODERADO">Moderado</option>
+                        <option value="SEDENTARIO">Sedentário / Nenhum</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-historico">Histórico Familiar:</label>
+                    <select id="select-historico" [(ngModel)]="avaliacao.risco_coronariano.historico_familiar"
+                        [disabled]="!isGestor()">
+                        <option value="NENHUM">Nenhum parente com doença cardíaca</option>
+                        <option value="UM_APOS_60">1 parente com doença após 60 anos</option>
+                        <option value="UM_ANTES_60">1 parente com doença antes dos 60 anos</option>
+                        <option value="VARIOS_ANTES_60">2 ou mais parentes antes dos 60 anos</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-tabagismo">Tabagismo:</label>
+                    <select id="select-tabagismo" [(ngModel)]="avaliacao.risco_coronariano.tabagismo"
+                        [disabled]="!isGestor()">
+                        <option value="NAO_FUMA">Não fuma</option>
+                        <option value="ATE_10">Até 10 cigarros/dia</option>
+                        <option value="ATE_20">11 a 20 cigarros/dia</option>
+                        <option value="MAIS_20">Mais de 20 cigarros/dia</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PAINEL DO RESULTADO DO RISCO -->
+            <div class="result-column">
+                <h3>Classificação de Risco Coronariano</h3>
+                <div class="risco-card">
+                    <div class="status-msg">Preencha todos os campos para calcular a pontuação</div>
+                    <ul class="escala-risco">
+                        <li><span>06 a 11:</span> Risco bem abaixo da média</li>
+                        <li><span>12 a 17:</span> Risco abaixo da média</li>
+                        <li><span>18 a 24:</span> Risco médio</li>
+                        <li><span>25 a 31:</span> Risco moderado</li>
+                        <li><span>32 a 40:</span> Risco alto</li>
+                        <li><span>41 a 62:</span> Risco muito alto</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: PERÍMETROS E RCQ -->
+        <div *ngIf="abaAtiva === 'perimetros' && avaliacao.perimetros" class="tab-pane split-layout">
+            <div class="form-column">
+                <h3>Perímetros (cm)</h3>
+
+                <!-- Ombro e Tórax -->
+                <div class="form-row">
+                    <label for="input-ombro">Ombro:</label>
+                    <input id="input-ombro" type="number" [(ngModel)]="avaliacao.perimetros.ombro"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-torax-relaxado">Tórax (Relaxado):</label>
+                    <input id="input-torax-relaxado" type="number" [(ngModel)]="avaliacao.perimetros.torax_relaxado"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-torax-inspirado">Tórax (Inspirado):</label>
+                    <input id="input-torax-inspirado" type="number" [(ngModel)]="avaliacao.perimetros.torax_inspirado"
+                        [readonly]="!isGestor()" />
+                </div>
+
+                <!-- Braços Relaxados -->
+                <div class="form-row">
+                    <label for="input-braco-dir">Braço Dir. (Relaxado):</label>
+                    <input id="input-braco-dir" type="number" [(ngModel)]="avaliacao.perimetros.braco_relaxado_dir"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-braco-esq">Braço Esq. (Relaxado):</label>
+                    <input id="input-braco-esq" type="number" [(ngModel)]="avaliacao.perimetros.braco_relaxado_esq"
+                        [readonly]="!isGestor()" />
+                </div>
+
+                <!-- Braços Contraídos -->
+                <div class="form-row">
+                    <label for="input-braco-contraido-dir">Braço Dir. (Contraído):</label>
+                    <input id="input-braco-contraido-dir" type="number"
+                        [(ngModel)]="avaliacao.perimetros.braco_contraido_dir" [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-braco-contraido-esq">Braço Esq. (Contraído):</label>
+                    <input id="input-braco-contraido-esq" type="number"
+                        [(ngModel)]="avaliacao.perimetros.braco_contraido_esq" [readonly]="!isGestor()" />
+                </div>
+
+                <!-- Antebraços -->
+                <div class="form-row">
+                    <label for="input-antebraaco-dir">Antebraço Dir.:</label>
+                    <input id="input-antebraaco-dir" type="number" [(ngModel)]="avaliacao.perimetros.antebraaco_dir"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-antebraaco-esq">Antebraço Esq.:</label>
+                    <input id="input-antebraaco-esq" type="number" [(ngModel)]="avaliacao.perimetros.antebraaco_esq"
+                        [readonly]="!isGestor()" />
+                </div>
+
+                <!-- Tronco -->
+                <div class="form-row">
+                    <label for="input-cintura">Cintura:</label>
+                    <input id="input-cintura" type="number" [(ngModel)]="avaliacao.perimetros.cintura"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-quadril">Quadril:</label>
+                    <input id="input-quadril" type="number" [(ngModel)]="avaliacao.perimetros.quadril"
+                        [readonly]="!isGestor()" />
+                </div>
+
+                <!-- Membros Inferiores -->
+                <div class="form-row">
+                    <label for="input-coxa-dir">Coxa Dir.:</label>
+                    <input id="input-coxa-dir" type="number" [(ngModel)]="avaliacao.perimetros.coxa_dir"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-coxa-esq">Coxa Esq.:</label>
+                    <input id="input-coxa-esq" type="number" [(ngModel)]="avaliacao.perimetros.coxa_esq"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-panturrilha-dir">Panturrilha Dir.:</label>
+                    <input id="input-panturrilha-dir" type="number" [(ngModel)]="avaliacao.perimetros.panturrilha_dir"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-panturrilha-esq">Panturrilha Esq.:</label>
+                    <input id="input-panturrilha-esq" type="number" [(ngModel)]="avaliacao.perimetros.panturrilha_esq"
+                        [readonly]="!isGestor()" />
+                </div>
+            </div>
+
+            <div class="result-column">
+                <h3>Relação Cintura x Quadril (RCQ)</h3>
+                <div class="rcq-card">
+                    <span class="rcq-val">{{ calcularRCQ() }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 4: COMPOSIÇÃO CORPORAL -->
+        <div *ngIf="abaAtiva === 'composicao' && avaliacao.composicao" class="tab-pane">
+
+            <!-- Medidas do Topo: Peso, Altura, IMC, TMB -->
+            <div class="medidas-topo">
+                <div class="field">
+                    <label for="input-peso">Peso (kg):</label>
+                    <input id="input-peso" type="number" step="0.1" [(ngModel)]="avaliacao.composicao.peso"
+                        (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                </div>
+
+                <div class="field">
+                    <label for="input-altura">Altura (m):</label>
+                    <input id="input-altura" type="number" step="0.01" [(ngModel)]="avaliacao.composicao.altura"
+                        (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                </div>
+
+                <div class="result-box">
+                    <label>IMC:</label>
+                    <strong>{{ calcularIMC() }}</strong>
+                </div>
+
+                <div class="result-box">
+                    <label>TMB (kcal):</label>
+                    <strong>{{ calcularTMB() }}</strong>
+                </div>
+            </div>
+
+            <!-- Navegação de Sub-abas (Dobras Cutâneas / Bioimpedância) -->
+            <div class="subtabs-bar">
+                <button type="button" [class.active]="tipoComposicao === 'DOBRAS'" (click)="tipoComposicao = 'DOBRAS'">
+                    Dobras Cutâneas
+                </button>
+                <button type="button" [class.active]="tipoComposicao === 'BIOIMPEDANCIA'"
+                    (click)="tipoComposicao = 'BIOIMPEDANCIA'">
+                    Bioimpedância
+                </button>
+            </div>
+
+            <!-- CONTEÚDO 1: DOBRAS CUTÂNEAS -->
+            <div class="grid-dobras" *ngIf="tipoComposicao === 'DOBRAS' && avaliacao.composicao.dobras as dobras">
+
+                <!-- Painel da Esquerda: Todas as Dobras Cutâneas -->
+                <div class="panel-inputs">
+                    <h3>Dobras Cutâneas (mm)</h3>
+
+                    <div class="form-row">
+                        <label for="input-subescapular">Subescapular:</label>
+                        <input id="input-subescapular" type="number" [(ngModel)]="dobras.subescapular"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-bicipital">Bicipital:</label>
+                        <input id="input-bicipital" type="number" [(ngModel)]="dobras.bicipital"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-tricipital">Tricipital:</label>
+                        <input id="input-tricipital" type="number" [(ngModel)]="dobras.tricipital"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-axilar_media">Axilar-média:</label>
+                        <input id="input-axilar_media" type="number" [(ngModel)]="dobras.axilar_media"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-suprailiaca">Supra-ilíaca:</label>
+                        <input id="input-suprailiaca" type="number" [(ngModel)]="dobras.suprailiaca"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-peitoral">Peitoral:</label>
+                        <input id="input-peitoral" type="number" [(ngModel)]="dobras.peitoral"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-abdominal">Abdominal:</label>
+                        <input id="input-abdominal" type="number" [(ngModel)]="dobras.abdominal"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-coxa">Coxa:</label>
+                        <input id="input-coxa" type="number" [(ngModel)]="dobras.coxa" (input)="calcularComposicao()"
+                            [readonly]="!isGestor()" />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="input-panturrilha">Panturrilha:</label>
+                        <input id="input-panturrilha" type="number" [(ngModel)]="dobras.panturrilha"
+                            (input)="calcularComposicao()" [readonly]="!isGestor()" />
+                    </div>
+                </div>
+
+                <!-- Painel da Direita: Seleção do Protocolo e Resultados -->
+                <div class="protocolo-bar">
+                    <div class="field-group">
+                        <div class="field flex-1">
+                            <label>Protocolo:</label>
+                            <select [(ngModel)]="avaliacao.composicao.protocolo" (change)="calcularComposicao()"
+                                [disabled]="!isGestor()">
+                                <option value="JACKSON_POLLOCK_3">Jackson & Pollock (3 Dobras)</option>
+                                <option value="JACKSON_POLLOCK_7">Jackson & Pollock (7 Dobras)</option>
+                                <option value="FAULKNER">Faulkner (4 Dobras)</option>
+                                <option value="PETROSKI">Petroski (4 Dobras)</option>
+                                <option value="GUEDES">Guedes (3 Dobras)</option>
+                            </select>
+                        </div>
+
+                        <div class="field w-30">
+                            <label>% Ideal:</label>
+                            <input type="number" [(ngModel)]="gorduraIdealPerc" (input)="calcularComposicao()"
+                                [readonly]="!isGestor()" />
+                        </div>
+
+                        <button type="button" class="btn-calc" (click)="calcularComposicao()">Calcular</button>
+                    </div>
+
+                    <!-- Cards de Resultados -->
+                    <div class="composicao-resultados">
+                        <div class="res-card">
+                            <span class="lbl">Gordura Atual</span>
+                            <span class="val highlight">{{ percentualGorduraAtual | number:'1.2-2' }}%</span>
+                        </div>
+                        <div class="res-card">
+                            <span class="lbl">Massa Magra</span>
+                            <span class="val">{{ massaMagraKg | number:'1.2-2' }} kg</span>
+                        </div>
+                        <div class="res-card">
+                            <span class="lbl">Massa Gorda</span>
+                            <span class="val">{{ massaGordaKg | number:'1.2-2' }} kg</span>
+                        </div>
+                        <div class="res-card">
+                            <span class="lbl">Gordura Ideal</span>
+                            <span class="val">{{ gorduraIdealPerc }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CONTEÚDO 2: BIOIMPEDÂNCIA -->
+            <div class="grid-bioimpedancia"
+                *ngIf="tipoComposicao === 'BIOIMPEDANCIA' && avaliacao.composicao.bioimpedancia as bio">
+                <div class="form-row">
+                    <label for="input-perc-gordura">% Gordura Corporal:</label>
+                    <input id="input-perc-gordura" type="number" step="0.1" [(ngModel)]="bio.perc_gordura"
+                        [readonly]="!isGestor()" />
+                </div>
+                <div class="form-row">
+                    <label for="input-perc-massa-magra">% Massa Magra:</label>
+                    <input id="input-perc-massa-magra" type="number" step="0.1" [(ngModel)]="bio.perc_massa_magra"
+                        [readonly]="!isGestor()" />
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ABA 5: CARDIORRESPIRATÓRIA -->
+        <div *ngIf="abaAtiva === 'cardio' && avaliacao.cardiorrespiratoria" class="tab-pane cardio-section">
+            <div class="cardio-header">
+                <h3>Avaliação Cardiorrespiratória - Volume de Oxigênio (VO₂)</h3>
+                <p class="subtitle">Selecione o protocolo de teste utilizado para a avaliação:</p>
+            </div>
+
+            <!-- GRID DE PROTOCOLOS COM SELEÇÃO DINÂMICA -->
+            <div class="protocolos-grid">
+                <!-- CARD ESTEIRA -->
+                <div class="protocolo-card">
+                    <div class="card-title">
+                        <span class="icon">🏃</span>
+                        <h4>Esteira</h4>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn-protocolo"
+                            [class.active]="avaliacao.cardiorrespiratoria.protocolo_utilizado === 'BRUCE'"
+                            (click)="isGestor() && (avaliacao.cardiorrespiratoria.protocolo_utilizado = 'BRUCE')">
+                            Protocolo de Bruce
+                        </button>
+                        <button type="button" class="btn-protocolo"
+                            [class.active]="avaliacao.cardiorrespiratoria.protocolo_utilizado === 'BALKE'"
+                            (click)="isGestor() && (avaliacao.cardiorrespiratoria.protocolo_utilizado = 'BALKE')">
+                            Protocolo de Balke-Ware
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD PISTA -->
+                <div class="protocolo-card">
+                    <div class="card-title">
+                        <span class="icon">🏃‍♂️</span>
+                        <h4>Pista</h4>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn-protocolo"
+                            [class.active]="avaliacao.cardiorrespiratoria.protocolo_utilizado === 'COOPER'"
+                            (click)="isGestor() && (avaliacao.cardiorrespiratoria.protocolo_utilizado = 'COOPER')">
+                            Protocolo de Cooper (12 min)
+                        </button>
+                        <button type="button" class="btn-protocolo"
+                            [class.active]="avaliacao.cardiorrespiratoria.protocolo_utilizado === '1_MILHA'"
+                            (click)="isGestor() && (avaliacao.cardiorrespiratoria.protocolo_utilizado = '1_MILHA')">
+                            Protocolo de 1 milha (1609m)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD BICICLETA -->
+                <div class="protocolo-card">
+                    <div class="card-title">
+                        <span class="icon">🚴</span>
+                        <h4>Bicicleta</h4>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn-protocolo"
+                            [class.active]="avaliacao.cardiorrespiratoria.protocolo_utilizado === 'ASTRAND'"
+                            (click)="isGestor() && (avaliacao.cardiorrespiratoria.protocolo_utilizado = 'ASTRAND')">
+                            Protocolo de Astrand (5 min)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAINEL DE RESULTADOS DO VO2 -->
+            <div class="vo2-resultados-container">
+                <h4>Resultados do VO₂</h4>
+                <div class="vo2-grid">
+                    <div class="vo2-card">
+                        <label>VO₂ Máximo Obtido</label>
+                        <div class="value-highlight">
+                            {{ avaliacao.cardiorrespiratoria.vo2_max_obtido || '0.00' }} <small>ml(kg.min)⁻¹</small>
+                        </div>
+                    </div>
+
+                    <div class="vo2-card accent">
+                        <label>VO₂ Máximo Previsto</label>
+                        <div class="value-highlight">
+                            {{ avaliacao.cardiorrespiratoria.vo2_max_previsto || '30.11' }} <small>ml(kg.min)⁻¹</small>
+                        </div>
+                    </div>
+
+                    <div class="vo2-card">
+                        <label>Déficit Aeróbico Funcional</label>
+                        <div class="value-highlight">
+                            {{ avaliacao.cardiorrespiratoria.deficit_aerobico_percentual || '0.00' }} <small>%</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 6: NEUROMOTORES -->
+        <div *ngIf="abaAtiva === 'neuromotores' && avaliacao.neuromotores" class="tab-pane">
+            <div class="form-group">
+                <label for="input-flexao">Flexão de Braços (repetições):</label>
+                <input id="input-flexao" type="number" [(ngModel)]="avaliacao.neuromotores.flexao_bracos_reps"
+                    [readonly]="!isGestor()" />
+            </div>
+            <div class="form-group">
+                <label for="input-abdominal">Abdominal (repetições):</label>
+                <input id="input-abdominal" type="number" [(ngModel)]="avaliacao.neuromotores.abdominal_reps"
+                    [readonly]="!isGestor()" />
+            </div>
+            <div class="form-group">
+                <label for="input-wells">Banco de Wells (cm):</label>
+                <input id="input-wells" type="number" [(ngModel)]="avaliacao.neuromotores.banco_wells_cm"
+                    [readonly]="!isGestor()" />
+            </div>
+        </div>
+
+        <!-- ABA 7: POSTURAL -->
+        <div *ngIf="abaAtiva === 'postural'" class="tab-pane postural-grid">
+            <div class="postural-card">
+                <h4>Vista Anterior</h4>
+                <div class="img-placeholder">
+                    <img *ngIf="avaliacao.postural?.foto_anterior_url" [src]="avaliacao.postural?.foto_anterior_url"
+                        alt="Anterior" />
+                </div>
+                <input type="file" *ngIf="isGestor()" (change)="uploadFotoPostural($event, 'anterior')" />
+            </div>
+
+            <div class="postural-card">
+                <h4>Vista Posterior</h4>
+                <div class="img-placeholder">
+                    <img *ngIf="avaliacao.postural?.foto_posterior_url" [src]="avaliacao.postural?.foto_posterior_url"
+                        alt="Posterior" />
+                </div>
+                <input type="file" *ngIf="isGestor()" (change)="uploadFotoPostural($event, 'posterior')" />
+            </div>
+
+            <div class="postural-card">
+                <h4>Vista Lateral</h4>
+                <div class="img-placeholder">
+                    <img *ngIf="avaliacao.postural?.foto_lateral_url" [src]="avaliacao.postural?.foto_lateral_url"
+                        alt="Lateral" />
+                </div>
+                <input type="file" *ngIf="isGestor()" (change)="uploadFotoPostural($event, 'lateral')" />
+            </div>
+        </div>
+
+        <!-- ABA 8: CONFIGURAÇÃO (APENAS GESTOR) -->
+        <div *ngIf="abaAtiva === 'config' && isGestor() && avaliacao.configuracao" class="tab-pane">
+            <h3>Exibir na Avaliação</h3>
+            <div class="checkbox-group">
+                <input id="cfg-anamnese" type="checkbox" [(ngModel)]="avaliacao.configuracao.exibir_anamnese" />
+                <label for="cfg-anamnese">Anamnese</label>
+            </div>
+            <div class="checkbox-group">
+                <input id="cfg-risco" type="checkbox" [(ngModel)]="avaliacao.configuracao.exibir_risco" />
+                <label for="cfg-risco">Risco Coronariano</label>
+            </div>
+            <div class="checkbox-group">
+                <input id="cfg-perimetros" type="checkbox" [(ngModel)]="avaliacao.configuracao.exibir_perimetros" />
+                <label for="cfg-perimetros">Perímetros</label>
+            </div>
+            <div class="checkbox-group">
+                <input id="cfg-composicao" type="checkbox" [(ngModel)]="avaliacao.configuracao.exibir_composicao" />
+                <label for="cfg-composicao">Composição Corporal</label>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RODAPÉ COM AÇÃO DE SALVAR -->
+    <div class="footer-actions" *ngIf="isGestor()">
+        <button class="btn-save" (click)="salvarAvaliacao()" [disabled]="salvando">
+            {{ salvando ? 'Salvando...' : '✓ Salvar Avaliação' }}
+        </button>
+    </div>
+</div>

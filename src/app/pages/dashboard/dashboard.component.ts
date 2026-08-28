@@ -5,12 +5,13 @@ import { UserProfileCardComponent } from "./components/user-profile-card/user-pr
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { UsuarioService } from '../../services/usuario.service';
+import { AvaliacaoFisicaComponent } from "./components/avaliacao-fisica/avaliacao-fisica.component";
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [CommonModule,TreinosSectionComponent, PagamentosSectionComponent, UserProfileCardComponent]
+  imports: [CommonModule, TreinosSectionComponent, PagamentosSectionComponent, UserProfileCardComponent, AvaliacaoFisicaComponent]
 })
 export class DashboardComponent implements OnInit {
   usuarioLogado: any;
