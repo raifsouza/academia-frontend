@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AlunoSugestao, AvaliacaoFisica } from '../models/avaliacaoFisica.model';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,8 @@ export class AvaliacaoService {
   private readonly http = inject(HttpClient);
   
   // Endpoint Next.js (Ajuste a porta/domínio se seu Next.js estiver rodando em outra URL)
-  private readonly apiUrl = '/api/avaliacoes';
-  private readonly apiUrl2 = '/api/alunos';
-
+  private readonly apiUrl = `${environment.apiUrl}/avaliacoes`;
+  private readonly apiUrl2 = `${environment.apiUrl}/alunos`;
 
 buscarAlunos(query: string): Observable<AlunoSugestao[]> {
     return this.http.get<AlunoSugestao[]>(this.apiUrl2).pipe(

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
+import { environment } from '../../environments/environment.development';
 
 export interface Pagamento {
   id?: number;
@@ -16,7 +17,7 @@ export interface Pagamento {
   providedIn: 'root'
 })
 export class PagamentoService {
-  private apiUrl = 'http://localhost:3000/api/pagamentos';
+  private readonly apiUrl = `${environment.apiUrl}/pagamentos`;
 
   constructor(private http: HttpClient) {}
 

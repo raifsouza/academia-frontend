@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment.development';
 
 
 export interface Aluno {
@@ -14,7 +15,7 @@ export interface Aluno {
   providedIn: 'root'
 })
 export class UsuarioService {
-  private apiUrl = 'http://localhost:3000/api';
+  private API_URL = environment.apiUrl;
 
   // 1. Inicializa o BehaviorSubject lendo o valor salvo no localStorage
   private usuarioSubject = new BehaviorSubject<any>(this.getUsuarioDoStorage());
@@ -57,14 +58,14 @@ export class UsuarioService {
 
 
   cadastrarUsuario(dados: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/alunos`, dados);
+    return this.http.post<any>(`${this.API_URL}/alunos`, dados);
   }
 
 
 
   // --- MÉTODOS EXISTENTES DO SERVICE ---
   buscarUsuarios(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/alunos`);
+    return this.http.get<any[]>(`${this.API_URL}/alunos`);
   }
   
 
@@ -73,7 +74,7 @@ export class UsuarioService {
    * Método de Login: Autentica na API e notifica todos os inscritos (Subscribers)
    */
   login(credenciais: any): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/login`, credenciais).pipe(
+  return this.http.post<any>(`${this.API_URL}/login`, credenciais).pipe(
     tap((resposta) => {
       // Pega o objeto interno se vier { message, usuario }, caso contrário pega a resposta direta
       const usuarioDados = resposta.usuario ? resposta.usuario : resposta;
@@ -117,7 +118,7 @@ export class UsuarioService {
     const payload = { foto_url: fotoBase64 };
 
     // Ajuste o endpoint da API conforme seu backend (ex: PUT /api/usuarios/7/foto ou PATCH /api/usuarios/7)
-    return this.http.put<any>(`${this.apiUrl}/alunos/${idUsuario}`, payload).pipe(
+    return this.http.put<any>(`${this.API_URL}/alunos/${idUsuario}`, payload).pipe(
       tap((resposta) => {
         const usuarioEditado = {
           ...this.usuarioAtual,

@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Treino } from '../models/treino.model';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TreinoService {
   // Ajuste a URL base para o endpoint da sua API
-  private readonly API_URL = 'http://localhost:3000/api/treinos';
+  private readonly API_URL = `${environment.apiUrl}/treinos`;
 
   constructor(private http: HttpClient) {}
 
